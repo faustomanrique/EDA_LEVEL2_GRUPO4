@@ -26,10 +26,19 @@ TrigramProfile buildTrigramProfile(const Text &text)
 {
     wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-    // Your code goes here...
-    for (auto line : text)
+    TrigramProfile trigProfReturn;
+    
+    int i, j;
+    for (i = 0; i <= text.size(); i++)
     {
-        if ((line.length() > 0) &&
+
+    }
+
+
+    
+    for (auto& line : text)
+    {
+        if  ((line.length() > 0) &&
             (line[line.length() - 1] == '\r'))
             line = line.substr(0, line.length() - 1);
     }
@@ -81,4 +90,23 @@ string identifyLanguage(const Text &text, LanguageProfiles &languages)
     // Your code goes here...
 
     return ""; // Fill-in result here
+}
+
+/*
+* @brief Checks a list for a set number of characters
+* 
+* @param list The list 
+* @param n The number
+* @return 1 if it has less than n characters, 0 otherwise
+*/
+bool hasLessThanNChars(Text& text, int n)
+{
+    size_t total = 0;
+    for (const auto& s : text) {
+        total += s.size();
+
+        if (total >= 3)
+            return false;
+    }
+    return true;
 }
