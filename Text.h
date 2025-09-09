@@ -12,7 +12,7 @@
 #include <string>
 
 // Text: list of strings
-typedef std::list<std::string> Text;
+typedef std::list<std::string> Text; //lista doblemente enlazada 
 
 // Functions
 bool getTextFromString(const std::string &s, Text &text);
