@@ -22,34 +22,61 @@ using namespace std;
  * @param text Vector of lines (Text)
  * @return TrigramProfile The trigram profile
  */
-TrigramProfile buildTrigramProfile(const Text &text)
+TrigramProfile buildTrigramProfile(const Text& text)
 {
     wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
     TrigramProfile trigProfReturn;
-    
-    int i, j;
-    for (i = 0; i <= text.size(); i++)
+    std::string max_len[5];
+    float max[5] = { 0.0,0.0,0.0,0.0,0.0 };
+    // Recorremos una copia de cada línea para poder podarla sin romper el const&
+    for (std::string line : text) //ver si puedo pasar la referencia
     {
+        // Podar CR final (archivos con CRLF)
+        if (!line.empty() && line.back() == '\r')   //borrar el CRLF que aparece en algunos archivos
+            line.pop_back();
 
+        if (line.empty())  //Si la linea es null entonces cambia de linea
+            continue;
+
+        // 1) UTF-8 -> Unicode
+        std::wstring wline = converter.from_bytes(line);
+
+        // 2) Si no hay al menos 3 code points, no hay trigramas
+        if (wline.size() < 3)
+            continue;
+
+        // 3) Ventana deslizante de tamaño 3
+
+        
+        for (auto i = 0; i + 2 < wline.size(); ++i)     //garantiza que existan 3 caracteres desde i en adelante. 
+        {
+            std::wstring wtri = wline.substr(i, 3);     //Toma el trigrama como subcadena Unicode de longitud 3 a partir de i
+
+            // 4) Unicode -> UTF-8 para usar como clave std::string
+            std::string tri = converter.to_bytes(wtri);
+
+            trigProfReturn[tri] += 1.0f;//incrementa la cantidad del trigrama tri en el mapa trigProfReturn
+
+
+            /*for (auto i : trigProfReturn) {
+                for (int i = 0; i < 5; i++) {
+                    if (max[i] < trigProfReturn[tri]) {
+                        max[i] = trigProfReturn[tri];
+                        max_len[i] = tri;
+                    }
+                }
+
+            }
+            */
+        }
+        for (const auto& pair : trigProfReturn)
+        {
+            std::cout << pair.first << std::endl;
+        }
     }
-
-
     
-    for (auto& line : text)
-    {
-        if  ((line.length() > 0) &&
-            (line[line.length() - 1] == '\r'))
-            line = line.substr(0, line.length() - 1);
-    }
-
-    // Tip: converts UTF-8 string to wstring
-    // wstring unicodeString = converter.from_bytes(textLine);
-
-    // Tip: convert wstring to UTF-8 string
-    // string trigram = converter.to_bytes(unicodeTrigram);
-
-    return TrigramProfile(); // Fill-in result here
+    return trigProfReturn; // Fill-in result here
 }
 
 /**
@@ -59,7 +86,19 @@ TrigramProfile buildTrigramProfile(const Text &text)
  */
 void normalizeTrigramProfile(TrigramProfile &trigramProfile)
 {
-    // Your code goes here...
+    float norma = 0.0;
+    for (auto& i : trigramProfile)
+    {
+        float adder = i.second;
+        norma += (adder * adder);
+    }
+
+    norma = std::sqrtf(norma);
+
+    for (auto &i : trigramProfile)
+    {
+        i.second /= norma;
+    }
 
     return;
 }
@@ -73,9 +112,17 @@ void normalizeTrigramProfile(TrigramProfile &trigramProfile)
  */
 float getCosineSimilarity(TrigramProfile &textProfile, TrigramProfile &languageProfile)
 {
-    // Your code goes here...
+    float result = 0;
 
-    return 0; // Fill-in result here
+    for (auto &textIt : textProfile) // Recorro todos los trigramas del texto
+    {
+        auto langIt = languageProfile.find(textIt.first); // Me fijo si existe ese trigrama en el lenguaje
+        if  (langIt != languageProfile.end())
+        {
+            result += (langIt->second * textIt.second); // Si existe, opero
+        }
+    }
+    return result;
 }
 
 /**
@@ -85,11 +132,30 @@ float getCosineSimilarity(TrigramProfile &textProfile, TrigramProfile &languageP
  * @param languages A list of Language objects
  * @return string The language code of the most likely language
  */
-string identifyLanguage(const Text &text, LanguageProfiles &languages)
+string identifyLanguage(const Text& text, LanguageProfiles& languages)
 {
-    // Your code goes here...
+    TrigramProfile trig_prof = buildTrigramProfile(text);
+    TrigramProfile& ref_trig_prof = trig_prof;
+    if (trig_prof.empty() || languages.empty())
+    {
+        return "";  // sin datos para decidir
+    }
+    normalizeTrigramProfile(ref_trig_prof);
 
-    return ""; // Fill-in result here
+    float max = 0.0f;
+    std::string lan_identified;
+    float n;
+    for (auto& lan : languages)
+    {
+        if (lan.trigramProfile.empty()) continue;
+        n = getCosineSimilarity(ref_trig_prof, lan.trigramProfile);
+        if (n > max)
+        {
+            max = n;
+            lan_identified = lan.languageCode;
+        }
+    }
+    return lan_identified;
 }
 
 /*
