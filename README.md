@@ -81,7 +81,7 @@ And there's a hand, my trusty fiere! and gie's a hand o' thine! And we’ll tak'
 
 El lequel dice ingles, el texto esta en Scots. Esta es una lengua germánica emparentada con el 
 inglés, distinta pero cercana. Mutua comprensión variable. Por lo que aunque no tengamos el modelo
-de trigrama del Scots al parecerse mucho al ingles reconoc el idioma como ingles.
+de trigrama del Scots al parecerse mucho reconoce el idioma como ingles.
 
 12. El siguiente texto está en inglés. ¿Qué dice Lequel? ¿Qué falla? Justifica por qué ocurre lo que ocurre.
 
