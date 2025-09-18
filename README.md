@@ -2,9 +2,7 @@
 
 ## Integrantes del grupo y contribución al trabajo de cada integrante
 
-* [Nombre]: [contribución]
-
-[completar]
+Fausto Manrique: Funciones de normalización y de 
 
 ## Respuestas del enunciado
 
@@ -90,8 +88,21 @@ WE HAD EVERYTHING BEFORE US, WE HAD NOTHING BEFORE US,
 WE WERE ALL GOING DIRECT TO HEAVEN, WE WERE ALL GOING DIRECT THE OTHER WAY
 – IN SHORT, THE PERIOD WAS SO FAR LIKE THE PRESENT PERIOD, THAT SOME OF ITS NOISIEST AUTHORITIES INSISTED ON ITS BEING RECEIVED, FOR GOOD OR FOR EVIL, IN THE SUPERLATIVE DEGREE OF COMPARISON ONLY.
 
-El texto es detectado como si estuviese escrito en Afrikaans. Esto se debe a que al estar el texto en mayuscula
+El texto es detectado como si estuviese escrito en Afrikaans. Esto se debe a que al estar el texto en mayuscula y los perfiles de cada lenguaje en minúscula, 
+solamente se interpretan y comparan los trigramas que se componen de símbolos de puntuación. Luego de investigar el problema, se 
+intentó pasar el texto a letra miníuscula, luego de lo cuál el algoritmo anduvo perfectamente. 
 
 ## Bonus points
 
-Luego de leer el articulo aprendimos mas de la similitud coseno y podemos concluir que: Mide cuán parecidos son dos vectores calculando el coseno del ángulo entre ellos. Normaliza magnitudes, enfocándose en la dirección. Es clave al comparar documentos sin sesgo por largo (NLP), recomendación y detección de plagio, comparando perfiles de características. Se obtiene sumando productos elemento a elemento y dividiendo por las normas de ambas, así “anula” la longitud y solo mira el ángulo, o sea, la dirección del vector.
+Luego de leer el articulo aprendimos mas de la similitud coseno y podemos concluir que: Mide 
+cuán parecidos son dos vectores calculando el coseno del ángulo entre ellos. Normaliza magnitudes, 
+enfocándose en la dirección. Es clave al comparar documentos sin sesgo por largo (NLP), 
+recomendación y detección de plagio, comparando perfiles de características. Se obtiene sumando 
+productos elemento a elemento y dividiendo por las normas de ambas, así “anula” la longitud y solo 
+mira el ángulo, o sea, la dirección del vector.
+
+Para cada trigrama analizado se debe recorrer todo el perfil en busca de igualdades para evitar 
+repeticiones. Si el texto es muy grande, esto puede generar grandes pérdidas en cálculo. Una forma 
+de evitar esto sería poner un límite máximo de trigramas analizables por texto. Otra similar sería 
+poner un límite de comparaciones posibles entre dos perfiles (uno de texto y otro de lenguaje). 
+Tamién se podría cambiar el algoritmo de comparación de perfiles por algo más parecido a mergesort.
