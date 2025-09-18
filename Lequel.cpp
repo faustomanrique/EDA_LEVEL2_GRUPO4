@@ -25,58 +25,29 @@ using namespace std;
 TrigramProfile buildTrigramProfile(const Text& text)
 {
     wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
     TrigramProfile trigProfReturn;
-    std::string max_len[5];
-    float max[5] = { 0.0,0.0,0.0,0.0,0.0 };
-    // Recorremos una copia de cada línea para poder podarla sin romper el const&
-    for (std::string line : text) //ver si puedo pasar la referencia
+    
+    for (std::string line : text)
     {
-        // Podar CR final (archivos con CRLF)
-        if (!line.empty() && line.back() == '\r')   //borrar el CRLF que aparece en algunos archivos
+        if (!line.empty() && line.back() == '\r')           //borrar el CRLF que aparece en algunos archivos
             line.pop_back();
 
-        if (line.empty())  //Si la linea es null entonces cambia de linea
+        if (line.empty())                                   //Si la linea es null entonces cambia de linea
+            continue;
+        std::wstring wline = converter.from_bytes(line);    //UTF-8 -> Unicode
+        if (wline.size() < 3)                               // Si no hay al menos 3 code points, no hay trigramas
             continue;
 
-        // 1) UTF-8 -> Unicode
-        std::wstring wline = converter.from_bytes(line);
-
-        // 2) Si no hay al menos 3 code points, no hay trigramas
-        if (wline.size() < 3)
-            continue;
-
-        // 3) Ventana deslizante de tamaño 3
-
-        
-        for (auto i = 0; i + 2 < wline.size(); ++i)     //garantiza que existan 3 caracteres desde i en adelante. 
+        for (auto i = 0; i + 2 < wline.size(); ++i)         //garantiza que existan 3 caracteres desde i en adelante. 
         {
-            std::wstring wtri = wline.substr(i, 3);     //Toma el trigrama como subcadena Unicode de longitud 3 a partir de i
+            std::wstring wtri = wline.substr(i, 3);         //Toma el trigrama como subcadena Unicode de longitud 3 a partir de i
+            std::string tri = converter.to_bytes(wtri);     //Unicode -> UTF-8 para usar como clave std::string
 
-            // 4) Unicode -> UTF-8 para usar como clave std::string
-            std::string tri = converter.to_bytes(wtri);
-
-            trigProfReturn[tri] += 1.0f;//incrementa la cantidad del trigrama tri en el mapa trigProfReturn
-
-
-            /*for (auto i : trigProfReturn) {
-                for (int i = 0; i < 5; i++) {
-                    if (max[i] < trigProfReturn[tri]) {
-                        max[i] = trigProfReturn[tri];
-                        max_len[i] = tri;
-                    }
-                }
-
-            }
-            */
-        }
-        for (const auto& pair : trigProfReturn)
-        {
-            std::cout << pair.first << std::endl;
+            trigProfReturn[tri] += 1.0f;                    //incrementa la cantidad del trigrama tri en el mapa trigProfReturn
         }
     }
     
-    return trigProfReturn; // Fill-in result here
+    return trigProfReturn;
 }
 
 /**
@@ -145,11 +116,11 @@ string identifyLanguage(const Text& text, LanguageProfiles& languages)
     float max = 0.0f;
     std::string lan_identified;
     float n;
-    for (auto& lan : languages)
+    for (auto& lan : languages)         //recorre todos los lenguajes
     {
         if (lan.trigramProfile.empty()) continue;
         n = getCosineSimilarity(ref_trig_prof, lan.trigramProfile);
-        if (n > max)
+        if (n > max)                   //busca cual lenguaje tiene la mayor similitud coseno 
         {
             max = n;
             lan_identified = lan.languageCode;
